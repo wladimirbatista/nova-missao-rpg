@@ -25,12 +25,14 @@ function exibirAsciiArt() { // Função para exibir uma arte ASCII no console
   console.log(asciiArt);
 }
 
-function exibirListaDeMonstros(monstros) { // Função para exibir a lista de monstros e permitir que o usuário escolha um
+function exibirListaDeMonstros(monstros) { // Função que exibe uma lista de monstros e permitir que o usuário escolha um
+  
   while (true) { // permite o usuário escolher novamente caso a opção seja inválida
-    // Itera sobre os monstros exibido-os com indices
-    monstros.forEach((monstro, index) => {
-      console.log(`${[index + 1]} - ${monstro.nome}`);
-    });
+    // monstros.forEach((monstro, index) => { // exibe uma lista númerica de monstros
+    //   console.log(`${[index + 1]} - ${monstro.nome}`);
+    // });
+
+    exibirMonstrosNumerados(monstros);
 
     const opcaoEscolhida = entradaDados.question("\nEscolha uma opção: ");
 
@@ -43,6 +45,64 @@ function exibirListaDeMonstros(monstros) { // Função para exibir a lista de mo
   }
 }
 
+function exibirMonstrosNumerados(monstros) { // Função que percorre um array de monstros
+  monstros.forEach((monstro, index) => { // 
+    console.log(`${[index + 1]} - ${monstro.nome}`);
+  });
+}
+
+function realizarAtaque(atacante, defensor) { // Função para realizar um ataque entre um atacante e um defensor
+  const resultadoRolagemDado = rolagemDoDado(atacante.nivel);
+  const dano = calcularDano(atacante, defensor, resultadoRolagemDado);
+  // aplicarDano(defensor, dano);
+  const mensagemAtaque = criarMensagemAtaque(atacante, defensor, resultadoRolagemDado, dano);
+  return mensagemAtaque;
+}
+
+function calcularDano(atacante, defensor, resultadoRolagemDado) { // Função para calcular o dano de ataque
+  let dano;
+
+  if (resultadoRolagemDado === 'acerto') {
+    dano = atacante.ataque - defensor.defesa;
+  } else if (resultadoRolagemDado === 'acerto critico') {
+    dano = (atacante.ataque + 6) - defensor.defesa;
+  } else {
+    dano = 0;
+  }
+
+  return dano > 0 ? defensor.vida -= dano : defensor.vida -= 0;
+}
+
+function criarMensagemAtaque(atacante, defensor, resultadoRolagemDado, dano) { // Função que criar uma mensagem conforme o resultado da rolagem do dado
+  const mensagem = resultadoRolagemDado === 'acerto critico' // 
+  ? `causou ${dano} de dano critico!`
+  : resultadoRolagemDado === 'erro'
+    ? 'errou o ataque!'
+    : `causou ${dano} de dano!`
+
+  // const mensagemAtaque = `O ${atacante.nome} atacou o ${defensor.nome} e ${mensagem}`;
+
+  return `O ${atacante.nome} atacou o ${defensor.nome} e ${mensagem}`;
+}
+
+function rolagemDoDado(nivel) { //Função para simular o lançamento de um dado e determinar o resultado da rolagem
+  const rolarDado = Math.floor(Math.random() * 6) + 1;
+
+  if (nivel === 1 && rolarDado === 1) {
+    return 'acerto critico';
+  } else if (nivel === 2 && rolarDado <= 4) {
+    return 'acerto';
+  } else if (nivel === 3 && rolarDado <= 5) {
+    return 'acerto';
+  } else if (nivel === 4 && rolarDado <= 5) {
+    return 'acerto';
+  } else if (nivel === 5 && (rolarDado === 1 || rolarDado === 2)) {
+    return 'acerto';
+  } else {
+    return 'erro';
+  }
+}
+
 function exibirInfosArena(personagem, monstroEscolhido) { // Função para exibir informações sobre personagem e monstro na arena
   console.log(`\n******************`);
   console.log(`Personagem: ${personagem.nome.toUpperCase()}`);
@@ -52,123 +112,52 @@ function exibirInfosArena(personagem, monstroEscolhido) { // Função para exibi
   console.log(`Poção de Cura: ${personagem.pocaoCura}`);
   console.log(`******************`);
 
-  console.log(`\n*******************`);
+  console.log(`*******************`);
   console.log(`Monstro: ${monstroEscolhido.nome.toUpperCase()}`);
   console.log(`Ataque: ${monstroEscolhido.ataque}`);
-  console.log(`Defesa: ${personagem.defesa}`);
+  console.log(`Defesa: ${monstroEscolhido.defesa}`);
   console.log(`Vida: ${monstroEscolhido.vida}`);
   console.log(`*******************`);
 }
 
-function rolagemDoDado(nivel) { //Função para simular o lançamento de um dado e determinar o resultado da rolagem
-  const rolarDado = Math.floor(Math.random() * 6) + 1; // Simula o rolamento de um dado de 6 lados
-
-  // Simula a rolagem do dado com base no nível
-  if (nivel === 1) {
-    if (rolarDado === 1) {
-      return 'acerto critico';
-    } else if (rolarDado <= 3) {
-      return 'acerto';
-    } else {
-      return 'erro';
-    }
-  } else if (nivel === 2) {
-    if (rolarDado === 1) {
-      return 'acerto critico';
-    } else if (rolarDado <= 4) {
-      return 'acerto';
-    } else {
-      return 'erro';
-    }
-  } else if (nivel === 3) {
-    if (rolarDado === 1) {
-      return 'acerto critico';
-    } else if (rolarDado <= 5) {
-      return 'acerto';
-    } else {
-      return 'erro';
-    }
-  } else if (nivel === 4) {
-    if (rolarDado <= 2) {
-      return 'acerto critico';
-    } else if (rolarDado <= 5) {
-      return 'acerto';
-    } else {
-      return 'erro';
-    }
-  } else if (nivel === 5) {
-    if (rolarDado === 1) {
-      return 'acerto critico';
-    } else if (rolarDado === 2) {
-      return 'acerto';
-    } else {
-      return 'erro';
-    }
-  }
+function exibirMensagemAtaque(mensagem) {
+  console.log("*****************************************************");
+  console.log(mensagem);
+  console.log("*****************************************************");
 }
 
-function realizarAtaque(atacante, defensor) { // Função para realizar um ataque entre um atacante e um defensor
-
-  const resultadoRolagem = rolagemDoDado(atacante.nivel); // Código para simular a rolagem do dado com base no nível
-
-  let dano;
-
-  // define o dano de ataque conforme o resultado da rolagem do dado
-  if (resultadoRolagem === 'acerto') {
-    dano = (atacante.ataque + 1) - defensor.defesa
-  } else if (resultadoRolagem === 'acerto critico') {
-    dano = (atacante.ataque + 3) - defensor.defesa
-  } else {
-    dano = 0
-  }
-
-  if (dano > 0) {
-    defensor.vida = defensor.vida - dano // Reduz a vida do defensor pelo valor do dano
-  } else {
-    defensor.vida = defensor.vida - 0 // Caso o dano seja zero ou negativo, não reduz a vida do defensor
-  }
-
-  const mensagem = resultadoRolagem === 'acerto critico' // mensagem conforme o resultado da rolagem do dado
-    ? `causou ${dano} de dano critico!`
-    : resultadoRolagem === 'erro'
-      ? 'errou o ataque!'
-      : `causou ${dano} de dano!`
-
-  console.log("-----------------------------------------------------");
-  console.log(`O ${atacante.nome} atacou o ${defensor.nome} e ${mensagem}`);
-  console.log("-----------------------------------------------------");
-}
-
-
-function usarPocaoDeCura(personagem) { //Função para usar uma poção de curo no personagem
+function usarPocaoDeCura(personagem, monstroEscolhido) { //Função para usar uma poção de curo no personagem
   if (personagem.pocaoCura > 0) {
     personagem.vida += 20;
     personagem.pocaoCura--;
-    console.log("\n-------------------------------------------------------");
-    console.log(`O ${personagem.nome} bebeu uma poção de cura e recuperou 20 de vida.`);
-    console.log("-------------------------------------------------------");
+    exibirInfosArena(personagem, monstroEscolhido);
+    console.log("\n*******************************************************");
+    console.log(`O ${personagem.nome} bebeu uma poção de cura e ganhou +20 de vida.`);
+    console.log("*******************************************************");
   } else {
-    console.log("\n---------------------------------");
+    exibirInfosArena(personagem, monstroEscolhido);
+    console.log("\n********************************");
     console.log(`O ${personagem.nome} está sem poções de cura!`);
-    console.log("---------------------------------");
+    console.log("*********************************");
   }
 }
 
 function verificarVitoriaOuDerrota(personagem, monstroEscolhido) { // Função para verificar se o personagem venceu ou perdeu o combate
   if (personagem.vida <= 0) {
-    console.log('-----------------------------------------------');
-    console.log(`Você foi derrotado pelo ${monstroEscolhido.nome}. GAME OVER!!`);
-    console.log('-----------------------------------------------');
+    console.log('\n--------------DERROTA!!---------------');
+    console.log(`O ${personagem.nome} foi derrotado pelo ${monstroEscolhido.nome}!`);
+    console.log('--------------------------------------');
   } else {
-    console.log('------------------------------------');
-    console.log(`Você derrotou o ${monstroEscolhido.nome}. PARÁBENS!!`);
-    console.log('------------------------------------');
+    console.log('\n------------VITORIA!!----------');
+    console.log(`O ${personagem.nome} venceu o ${monstroEscolhido.nome}.`);
+    console.log('-------------------------------');
   }
 }
 
 export {
   exibirAsciiArt,
   exibirInfosArena,
+  exibirMensagemAtaque,
   exibirListaDeMonstros,
   realizarAtaque,
   usarPocaoDeCura,
