@@ -1,64 +1,77 @@
-import entradaDados from 'readline-sync';
-import { monstros, personagem } from './dados.js';
-import { realizarAtaque, usarPocaoDeCura } from './funcoes.js';
+import entradaDados from "readline-sync";
+import { monstros, personagem } from "./dados.js";
+import {
+  exibirAsciiArt,
+  exibirInfosArena,
+  exibirListaDeMonstros,
+  realizarAtaque,
+  usarPocaoDeCura,
+  verificarVitoriaOuDerrota,
+} from "./funcoes.js";
 
-function iniciarRPG() {
-  console.log('-----------RPG de Texto-----------');
-  console.log('Seja bem-vindo a uma nova aventura!');
-
-  personagem.nome = entradaDados.question('\nDigite o nome do seu personagem: ');
-
-  console.log('\nQual monstro seu personagem irá enfrentar:')
-
-  const monstroEscolhidoIndex = entradaDados.keyInSelect(monstros.map(monstro => monstro.nome), 'Escolha uma opção: ');
-
-  const monstroEscolhido = monstros[monstroEscolhidoIndex];
-
+function iniciarRPG() { // Função que inicia o jogo de RPG
+  let monstroEscolhidoIndex;
+  let monstroEscolhido;
+  let escolha;
   let turno = 1;
 
-  console.log(`\nO personagem ${personagem.nome} escolheu enfrentar um ${monstroEscolhido.nome}!\n`);
+  console.log("\n----------------------BEM VINDO AO RPG DE TEXTO----------------------\n");
 
-  console.log(`A BATALHA COMEÇEOU!`)
+  exibirAsciiArt(); // Consumindo função que exibe uma arte ASCII
 
-  while (personagem.vida > 0 && monstroEscolhido.vida > 0) {
-    console.log(`\n*****${personagem.nome}*****`);
-    console.log(`Ataque: ${personagem.ataque}`);
-    console.log(`Defesa: ${personagem.defesa}`);
-    console.log(`Vida: ${personagem.vida}`);
-    console.log(`Poção de Cura: ${personagem.pocaoCura}`)
-    console.log(`***************`);
+  console.log("\nNesta aventura, enfrente um monstro que está assolando o reino!");
+  console.log("\nVença essa batalha épica e torne-se um verdadeiro Herói!");
 
-    console.log(`\n*****${monstroEscolhido.nome}*****`);
-    console.log(`Ataque: ${monstroEscolhido.ataque}`);
-    console.log(`Defesa: ${personagem.defesa}`);
-    console.log(`Vida: ${monstroEscolhido.vida}`);
-    console.log(`************************`);
+  do { // Loop para escolher um monstro
+    console.log("\nQual monstro você deseja enfrentar? \n");
+  
+    monstroEscolhidoIndex = exibirListaDeMonstros(monstros);
+  
+    monstroEscolhido = monstros[monstroEscolhidoIndex];
+  
+    escolha = entradaDados.question("\nVocê tem certeza da sua escolha (S ou N)? ");
 
-    console.log('\n---------------------------------------------------');
-    console.log(`${turno++}° turno - Escolha a ação do seu personagem!`);
+    if (escolha === "N" || escolha === "n") {
+      console.log("\nJá que não tem certeza, escolha outro monstro!");
+    } else if (!(escolha === "S" || escolha === "s")) {
+      console.log("Escolha uma opção válida (S ou N):");
+    }
 
-    const opcao = entradaDados.keyInSelect(['Atacar', 'Curar'], 'Escolha uma opção:');
+  } while (escolha === 'N' || escolha === 'n')
+  
+  // Exibe o inicio da batalha 
+  console.log("\n----------------ARENA---------------");
+  console.log(`\nO ${personagem.nome} entrou na arena!`);
+  console.log(`\nO ${monstroEscolhido.nome} entrou na arena!`);
+  console.log(`\nA BATALHA VAI COMEÇAR!`);
 
-    if (opcao === 0) {
+  
+  
+  while (personagem.vida > 0 && monstroEscolhido.vida > 0) { // Loop principal da batalha
+
+    exibirInfosArena(personagem, monstroEscolhido); // Consumindo função que exibe as informações do personagem e do monstro
+
+    // Exibe o turno atual
+    console.log(`\n----------${turno++}° TURNO---------`);
+    console.log("Qual a sua proxima ação?");
+    console.log("\n1 - Atacar");
+    console.log("2 - Curar");
+
+    const opcao = entradaDados.question("\nEscolha uma opção: "); // escolha do usuário
+
+    // Executando ações conforme a escolha do usuário
+    if (opcao == 1) {
       realizarAtaque(personagem, monstroEscolhido);
       realizarAtaque(monstroEscolhido, personagem);
-    } else if (opcao === 1) {
+    } else if (opcao == 2) {
       usarPocaoDeCura(personagem);
       realizarAtaque(monstroEscolhido, personagem);
     } else {
-      console.log('\nOpção inválida. Por favor, escolha novamente!');
+      console.log("\nOpção inválida. Por favor, escolha novamente!");
     }
   }
 
-  if (personagem.vida <= 0) {
-    console.log(`\n$O personagem ${personagem.nome} foi derrotado. Game Over!`);
-  } else {
-    console.log(`\nO ${monstroEscolhido.nome} foi derrotado. Parabéns, ${personagem.nome}!`);
-  }
-
-  
-
-  // iniciarBatalha(personagem, monstroEscolhido);
+  verificarVitoriaOuDerrota(personagem, monstroEscolhido); // Consumindo função que verifica o resultado da batalha
 }
 
-iniciarRPG();
+iniciarRPG(); // Iniciando o jogo
